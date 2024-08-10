@@ -70,7 +70,7 @@ button:hover {
     display: block;
 }
 
-/* condition tab */
+/* today's weather tab (1st tab) */
 .condition-container {
     display: flex;
     flex-wrap: wrap;
@@ -115,4 +115,13 @@ button:hover {
 .condition-emoji {
     font-size: 3rem;
     margin-right: 10px;
+}
+
+/* today's temp tab (2nd tab) */
+#temperature {
+    width: 100%;
+    height: 400px;
+    max-width: 800px;
+    margin: 17px auto; 
+    padding: 5px;
 }
