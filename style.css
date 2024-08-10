@@ -1,0 +1,23 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #c498ff14;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-top: 20px;
+}
+/* Center the HR element and make it shorter */
+.styled-hr {
+    width: 50%;
+    margin: 0 auto;
+    border: 2px solid #6c18c0;
+}
+
+header {
+    display: flex;
+    justify-content: center;
+}

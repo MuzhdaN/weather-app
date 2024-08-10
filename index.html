@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Weather App</h1>
+    <header>
+        <input type="text" id="city" placeholder="Enter city name">
+        <button id="fetchWeather">Get Weather</button>
+    </header>
+    <hr class="styled-hr">
+
+    <div class="tab">
+        <button class="tablink" onclick="openTab('condition')">Today's Weather</button>
+        <button class="tablink" onclick="openTab('temperature')">Today's Temperature</button>
+        <button class="tablink" onclick="openTab('forecast')">Next Days' Weather</button>
+    </div>
+
+    <div id="condition" class="tabcontent">
+        <div id="conditionDisplay" class="condition-container"></div>
+    </div>
+
+    <div id="temperature" class="tabcontent">
+        <canvas id="temperatureChart"></canvas> <!-- Canvas for Chart.js -->
+    </div>
+
+    <div id="forecast" class="tabcontent">
+        <div id="forecastDisplay" class="forecast-container "></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js CDN -->
+    <script src="script.js"></script>
+</body>
+</html>
