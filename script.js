@@ -68,8 +68,9 @@ function fetchWeatherData() {
             // Filter data to show from the current time
             const filteredData = filterDataFromCurrentTime(data, currentTime);
 
-            displayTemperatureChart(filteredData);
             displayCondition(filteredData);
+            displayTemperatureChart(filteredData);
+            displayMultiDayForecast(data);
         })
         .catch(error => alert('An error occurred: ' + error.message));
 }
@@ -206,6 +207,56 @@ function displayCondition(data) {
     document.getElementById('conditionDisplay').innerHTML = conditionHtml;
 }
 
+function displayMultiDayForecast(data) {
+    // Ensure data for the week is present
+    const dailyTemperaturesMax = data.daily.temperature_2m_max || [];
+    const dailyTemperaturesMin = data.daily.temperature_2m_min || [];
+    const dailyWeather = data.daily.weathercode || [];
+    const days = data.daily.time || [];
+    
+    // Get today's date
+    const today = new Date();
+    const todayString = today.toISOString().split('T')[0]; // Current date in YYYY-MM-DD
+    today.setHours(0, 0, 0, 0); // Set time to start of the day for accurate comparison
+    console.log('Today:', todayString);
+
+    // Filter days to include only today and the next 7 days
+    const forecastDays = [];
+    for (let i = 0; i < days.length; i++) {
+        const day = new Date(days[i]);
+        day.setHours(0, 0, 0, 0); // Set time to start of the day for accurate comparison
+        if (day >= today) {
+            forecastDays.push(days[i]);
+            if (forecastDays.length === 7) break; // Stop after 7 days
+        }
+    }
+    console.log('Filtered Forecast Days:', forecastDays);
+
+    let forecastHtml = '';
+    
+    forecastDays.forEach((day, index) => {
+        // Get index of the filtered day in the original data
+        const originalIndex = days.indexOf(day);
+
+        const date = new Date(day);
+        const dayName = date.toLocaleDateString([], { weekday: 'long' });
+        const tempMax = dailyTemperaturesMax[originalIndex] !== undefined ? dailyTemperaturesMax[originalIndex] : 'N/A';
+        const tempMin = dailyTemperaturesMin[originalIndex] !== undefined ? dailyTemperaturesMin[originalIndex] : 'N/A';
+        const weatherEmoji = getConditionEmoji(dailyWeather[originalIndex]);
+
+        forecastHtml += `
+            <div class="forecast-item">
+                <h3>${dayName}</h3>
+                <div class="forecast-emoji">${weatherEmoji}</div>
+                <div class="forecast-temp">🔺 ${tempMax}°C</div>
+                <div class="forecast-temp">🔻 ${tempMin}°C</div>
+            </div>
+        `;
+    });
+
+    document.getElementById('forecastDisplay').innerHTML = forecastHtml;
+}
+
 function getConditionEmoji(code) {
     switch (code) {
         case 0: return '☀️'; // Clear sky
@@ -264,7 +315,7 @@ function openTab(tabName) {
     document.querySelector(`.tablink[onclick="openTab('${tabName}')"]`).classList.add('active');
 }
 
-// Open the today's (first) tab by default
+// Open the 'today's temp' (first) tab by default
 document.addEventListener('DOMContentLoaded', () => {
     openTab('condition');
 });
