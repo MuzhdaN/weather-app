@@ -69,3 +69,50 @@ button:hover {
 .tabcontent.active {
     display: block;
 }
+
+/* condition tab */
+.condition-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+}
+
+.condition-item {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 150px;
+    text-align: center;
+    position: relative;
+}
+
+.condition-item img {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
+}
+
+.condition-item h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.condition-item .time {
+    font-size: 14px;
+    color: #666;
+}
+
+.condition-item {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.condition-emoji {
+    font-size: 3rem;
+    margin-right: 10px;
+}
