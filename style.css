@@ -10,6 +10,7 @@ h1 {
     color: #333;
     margin-top: 20px;
 }
+
 /* Center the HR element and make it shorter */
 .styled-hr {
     width: 50%;
@@ -20,4 +21,51 @@ h1 {
 header {
     display: flex;
     justify-content: center;
+}
+
+input, button {
+    margin: 10px;
+    padding: 10px;
+    font-size: 16px;
+}
+
+button {
+    background-color: #8000ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #6c18c0;
+}
+
+.tab {
+    overflow: hidden;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.tab button {
+    background-color: #8000ff;
+    border: none;
+    padding: 14px 20px;
+    cursor: pointer;
+    /* margin: 2px 5px; */
+    border-radius: 5px;
+}
+
+.tab button.active {
+    background-color: #6c18c0;
+}
+
+.tabcontent {
+    display: none;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.tabcontent.active {
+    display: block;
 }
