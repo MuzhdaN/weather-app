@@ -53,8 +53,6 @@ function fetchWeatherData() {
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data)
-            console.log('API Response:', data); // Log API response
 
               // Check if daily data exists
               if (!data.daily) {
@@ -69,6 +67,8 @@ function fetchWeatherData() {
 
             // Filter data to show from the current time
             const filteredData = filterDataFromCurrentTime(data, currentTime);
+
+            displayTemperatureChart(filteredData);
             displayCondition(filteredData);
         })
         .catch(error => alert('An error occurred: ' + error.message));
@@ -102,7 +102,90 @@ function filterDataFromCurrentTime(data, currentTime) {
 }
 
 
-// current day (today's forcast)
+function displayTemperatureChart(data) {
+    console.log('here', data)
+    const temperatures = data.hourly.temperature_2m;
+    const times = data.hourly.time.map(time => {
+        const date = new Date(time);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    });
+
+    const ctx = document.getElementById('temperatureChart').getContext('2d');
+
+    if (window.temperatureChart && window.temperatureChart.destroy) {
+        window.temperatureChart.destroy();
+    }
+
+    window.temperatureChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: times,
+            datasets: [{
+                label: 'Temperature (°C)',
+                data: temperatures,
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                fill: true,
+                borderWidth: 12,
+                tension: 0.1,
+                pointRadius: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45
+                    },
+                    grid: {
+                        display: false
+                    },
+                    title: {
+                        display: false
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        display: false
+                    },
+                    title: {
+                        display: false // Hide y-axis title
+                    },
+                    ticks: {
+                        display: true // Remove y-axis grid lines
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: '#000',
+                    titleColor: '#FFF',
+                    bodyColor: '#FFF',
+                    borderColor: '#000',
+                    borderWidth: 12,
+                    callbacks: {
+                        label: function(context) {
+                            // const date = new Date(context.label);
+                            // const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            return `🌡️ ${context.raw}°C`;
+                        }
+                    }
+                },           
+                title: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// current day (today's forcast) functionailty
 function displayCondition(data) {
     const conditions = data.hourly.weathercode;
     const times = data.hourly.time;
