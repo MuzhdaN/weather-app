@@ -125,3 +125,31 @@ button:hover {
     margin: 17px auto; 
     padding: 5px;
 }
+
+/* forcast  tab*/
+#forecastDisplay {
+    margin-bottom: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+}
+
+.forecast-item {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 150px;
+    text-align: center;
+    position: relative;
+}
+
+.forecast-emoji {
+    font-size: 4rem;
+    margin-right: 10px;
+}
+
+.forecast-temp {
+    font-size: 16px;
+}
