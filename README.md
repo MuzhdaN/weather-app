@@ -25,10 +25,12 @@ The app uses the Open [Meteo API](https://open-meteo.com/en/docs) for fetching w
 
 ## Bugs
 - Tooltip for temperaure graph is not working properly
+- The dates are being converted to local timezone, this might be due to Date() object. Due to time constraint this bug was not solved. However, this should be the prority for the next version of the app. 
 
 ## Future Features
 - Display the weather hours from the current time.
 - Redesign the UI.
+
 
 
 ## Run the project
