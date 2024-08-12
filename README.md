@@ -6,6 +6,7 @@ This is a weather app that shows the weather condition and temperature graph for
 
 ## Features
 
+- **Search City**: When a city name is entered, the `get weather` button should be clicked to check the weather.
 - **Current Weather**: Displays the current weather conditions hourly for the day with weather emoji, and time. (the hours might be different based on the API response)
 - **Temperature Chart**: Shows a line chart of hourly temperatures for the current day.
 - **7-Day Forecast**: Provides a 7-day weather forecast with maximum and minimum temperatures.
