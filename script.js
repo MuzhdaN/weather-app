@@ -5,7 +5,6 @@ const geocodeEndpoint = 'https://geocoding-api.open-meteo.com/v1/search';
 document.getElementById('fetchWeather').addEventListener('click', fetchWeatherData);
 
 
-// Function to filter data for the current date (today)
 function filterDataForToday(data) {
     const now = new Date();
     // start of the current day
@@ -36,8 +35,6 @@ function fetchWeatherData() {
         return;
     }
 
-    const currentTime = new Date().toISOString(); // Capture current time
-
     fetch(`${geocodeEndpoint}?name=${city}`)
         .then(response => response.json())
         .then(data => {
@@ -47,15 +44,11 @@ function fetchWeatherData() {
             }
 
             const { latitude, longitude } = data.results[0];
-            // return fetch(`${apiEndpoint}?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,weathercode&forecast_days=16`);
             return fetch(`${apiEndpoint}?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,weathercode&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`);
-      
         })
         .then(response => response.json())
         .then(data => {
-
-              // Check if daily data exists
-              if (!data.daily) {
+            if (!data.daily) {
                 alert('Daily forecast data is not available.');
                 return;
             }
@@ -65,24 +58,58 @@ function fetchWeatherData() {
                 return;
             }
 
-            // Filter data to show from the current time
-            const filteredData = filterDataFromCurrentTime(data, currentTime);
+            const cityTimezone = data.timezone; // Get timezone from API response
+            const filteredData = filterDataForToday(data);
 
-            displayCondition(filteredData);
+            // timezone might be needed for the future features
+            displayCondition(filteredData, cityTimezone); // Pass timezone to displayCondition
             displayTemperatureChart(filteredData);
             displayMultiDayForecast(data);
         })
         .catch(error => alert('An error occurred: ' + error.message));
 }
 
+
+function displayCondition(data, timezone) {
+    const conditions = data.hourly.weathercode;
+    const times = data.hourly.time; // Raw times from the API
+
+    let conditionHtml = '';
+
+    // Current time in the city's timezone
+    const now = new Date(); // Local time
+    const options = { timeZone: timezone, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    const cityCurrentTime = new Intl.DateTimeFormat([], options).format(now);
+    // conditionHtml += `<div class="current-time">Current time in city: ${cityCurrentTime}</div>`;
+
+    times.forEach((time, index) => {
+        const conditionText = getConditionText(conditions[index]);
+        const conditionEmoji = getConditionEmoji(conditions[index]);
+
+        // Time is displayed exactly as provided by the API
+        const timePart = time.split('T')[1].split('Z')[0]; // Extract time portion
+
+        conditionHtml += `
+            <div class="condition-item">
+                <span class="condition-emoji">${conditionEmoji}</span>
+                <div class="time">${timePart}</div> 
+            </div>
+        `;
+    });
+
+    document.getElementById('conditionDisplay').innerHTML = conditionHtml;
+}
+
+
 function filterDataFromCurrentTime(data, currentTime) {
-    const now = new Date(currentTime);
+    
+    const now = new Date(currentTime); // currentTime is already in UTC
     const tomorrowStart = new Date(now);
     tomorrowStart.setDate(now.getDate() + 1);
-    tomorrowStart.setHours(0, 0, 0, 0);
+    tomorrowStart.setUTCHours(0, 0, 0, 0);
     
     const todayStart = new Date(now);
-    todayStart.setHours(0, 0, 0, 0);
+    todayStart.setUTCHours(0, 0, 0, 0);
 
     return {
         hourly: {
@@ -104,11 +131,12 @@ function filterDataFromCurrentTime(data, currentTime) {
 
 
 function displayTemperatureChart(data) {
-    console.log('here', data)
     const temperatures = data.hourly.temperature_2m;
-    const times = data.hourly.time.map(time => {
-        const date = new Date(time);
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const times = data.hourly.time;
+       // Extract the time portion directly from each timestamp string
+       const timeParts = times.map(time => {
+        // Extract time portion from the ISO 8601 timestamp string
+        return time.split('T')[1]; // Get "HH:MM" or "HH:MM:SS"
     });
 
     const ctx = document.getElementById('temperatureChart').getContext('2d');
@@ -120,14 +148,14 @@ function displayTemperatureChart(data) {
     window.temperatureChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: times,
+            labels: timeParts,
             datasets: [{
                 label: 'Temperature (°C)',
                 data: temperatures,
                 borderColor: '#007bff',
                 backgroundColor: 'rgba(0, 123, 255, 0.2)',
                 fill: true,
-                borderWidth: 12,
+                borderWidth: 2,
                 tension: 0.1,
                 pointRadius: 0
             }]
@@ -144,7 +172,12 @@ function displayTemperatureChart(data) {
                         display: false
                     },
                     title: {
-                        display: false
+                        display: true,
+                        text: 'Time',
+                        color: '#6c18c0',
+                        font: {
+                            size: 14
+                        }
                     }
                 },
                 y: {
@@ -153,10 +186,15 @@ function displayTemperatureChart(data) {
                         display: false
                     },
                     title: {
-                        display: false // Hide y-axis title
+                        display: true,
+                        text: 'Temperature (°C)',
+                        color: '#6c18c0',
+                        font: {
+                            size: 14
+                        }
                     },
                     ticks: {
-                        display: true // Remove y-axis grid lines
+                        display: true 
                     }
                 }
             },
@@ -169,11 +207,9 @@ function displayTemperatureChart(data) {
                     titleColor: '#FFF',
                     bodyColor: '#FFF',
                     borderColor: '#000',
-                    borderWidth: 12,
+                    borderWidth: 2,
                     callbacks: {
                         label: function(context) {
-                            // const date = new Date(context.label);
-                            // const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                             return `🌡️ ${context.raw}°C`;
                         }
                     }
@@ -186,26 +222,6 @@ function displayTemperatureChart(data) {
     });
 }
 
-// current day (today's forcast) functionailty
-function displayCondition(data) {
-    const conditions = data.hourly.weathercode;
-    const times = data.hourly.time;
-
-    let conditionHtml = '';
-    times.forEach((time, index) => {
-        const conditionText = getConditionText(conditions[index]); //might use it later
-        const conditionEmoji = getConditionEmoji(conditions[index]);
-        conditionHtml += `
-            <div class="condition-item">
-                <span class="condition-emoji">${conditionEmoji}</span>
-               
-                <div class="time">${new Date(time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-            </div>
-        `;
-    });
-
-    document.getElementById('conditionDisplay').innerHTML = conditionHtml;
-}
 
 function displayMultiDayForecast(data) {
     // Ensure data for the week is present
@@ -218,7 +234,6 @@ function displayMultiDayForecast(data) {
     const today = new Date();
     const todayString = today.toISOString().split('T')[0]; // Current date in YYYY-MM-DD
     today.setHours(0, 0, 0, 0); // Set time to start of the day for accurate comparison
-    console.log('Today:', todayString);
 
     // Filter days to include only today and the next 7 days
     const forecastDays = [];
@@ -230,7 +245,6 @@ function displayMultiDayForecast(data) {
             if (forecastDays.length === 7) break; // Stop after 7 days
         }
     }
-    console.log('Filtered Forecast Days:', forecastDays);
 
     let forecastHtml = '';
     
